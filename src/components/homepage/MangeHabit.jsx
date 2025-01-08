@@ -26,9 +26,7 @@ const MangeHabits = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+
   useEffect(() => {
     const getTimeOfDay = () => {
       const currentHour = new Date().getHours();

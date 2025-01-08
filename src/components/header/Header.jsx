@@ -20,7 +20,7 @@ const Header = () => {
           onClick={() => navigate('/login')}
           className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
         >
-          Login
+          SignIn
         </button>
         <button
           onClick={() => navigate('/signup')}

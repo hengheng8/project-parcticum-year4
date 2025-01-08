@@ -1,250 +1,691 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { FaSearch, FaUpload,  FaEllipsisV, FaBell, FaCalendarAlt, FaUser, FaTasks, FaSignOutAlt, FaPlus } from 'react-icons/fa';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import folder from '../../assets/folder (1).png';
-import moon from '../../assets/moon.png';
-import add from '../../assets/add (1).png';
-import search from '../../assets/search (2).png';
-import calender from '../../assets/calendar.png';
-import arrowdown from '../../assets/down-arrow.png';
-import reminder from '../../assets/reminder.png';
-import listmenu from '../../assets/list (1).png';
-import settings from '../../assets/settings (1).png';
-import share from '../../assets/share (1).png';
-import document from '../../assets/folder (2).png';
-import {  useEffect } from "react";
+import pending from '../../assets/pending-tasks.png';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import walking from '../../assets/Health-Benefits-of-Walks-with-Your-Dog.jpeg'
 const Tracker = () => {
-  const [tasks, setTasks] = useState({ Today: [], Tomorrow: [], Yesterday: [] });
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("Today");
-  const [reminderText, setReminderText] = useState("Reminder Time");
-  const [habitText, setHabitText] = useState('Add Habits');
-  const [showHabitOptions, setShowHabitOptions] = useState(false);
-  const [showTaskInput, setShowTaskInput] = useState(false); 
-  const [newTask, setNewTask] = useState('');
-  const [sidebarTasks, setSidebarTasks] = useState([]); 
-  const [timeOfDay, setTimeOfDay] = useState("");
-    
-    useEffect(() => {
-      const getTimeOfDay = () => {
-        const currentHour = new Date().getHours();
-        if (currentHour >= 6 && currentHour < 12) {
-          return "Morning";
-        } else if (currentHour >= 12 && currentHour < 18) {
-          return "Afternoon";
-        } else if (currentHour >= 18 && currentHour < 21) {
-          return "Evening";
-        } else {
-          return "Night";
-        }
-      };
+  const [userName, ] = useState("John Doe");
+  const [showCalendar, setShowCalendar] = useState(false);
   
-      setTimeOfDay(getTimeOfDay());
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [taskStatus,] = useState('In Progress');
   
-      // Optional: Update every hour for accuracy
-      const interval = setInterval(() => {
-        setTimeOfDay(getTimeOfDay());
-      }, 3600000); // 1 hour
+  const [taskName,] = useState("Task Image");
+  const currentDate = new Date();
+  const dayOfWeek = currentDate.toLocaleString('en-US', { weekday: 'long' });
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+ 
+  const closeModal = () => setIsModalOpen(false);
+  const [isChecked, setIsChecked] = useState(false);
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+  // Determine the status text based on checkbox state
+  const status = isChecked ? "Completed" : "Not Started";
   
-      return () => clearInterval(interval); // Cleanup interval
-    }, []);
-  
-
-  const handleAddTask = () => {
-    setShowTaskInput(true);
-  };
-
-  const handleTaskInputChange = (e) => {
-    setNewTask(e.target.value);
-  };
-
-  const handleTaskSubmit = () => {
-    if (newTask) {
-      const task = newTask;
-      setSidebarTasks([task, ...sidebarTasks]);
-      setShowTaskInput(false);
-      setNewTask('');
-    }
-  };
-
-  const handleDateClick = (date) => {
-    const today = new Date();
-    const selectedDay = new Date(date);
-
-    if (selectedDay.toDateString() === today.toDateString()) {
-      setSelectedDate("Today");
-    } else if (
-      selectedDay.toDateString() === new Date(today.setDate(today.getDate() + 1)).toDateString()
-    ) {
-      setSelectedDate("Tomorrow");
-    } else if (
-      selectedDay.toDateString() === new Date(today.setDate(today.getDate() - 2)).toDateString()
-    ) {
-      setSelectedDate("Yesterday");
-    } else {
-      setSelectedDate(selectedDay.toLocaleDateString());
-    }
-    setShowDatePicker(false);
-  };
-
-  const handleOptionClick = (option) => {
-    setReminderText(option);
-    setShowOptions(false);
-  };
-
-  const handleHabitOptionClick = (option) => {
-    setHabitText(option);
-    setShowHabitOptions(false);
-  };
-
   return (
-    <div className="flex h-screen bg-gray-600">
-      <div className="bg-black w-[30%] h-full p-8 shadow-lg rounded-r-lg">
-        <div className="flex space-x-4 mb-6 border-2 border-gray-300 shadow-lg rounded-lg p-2">
-          <img
-            src="https://via.placeholder.com/150"
-            alt="Profile"
-            className="w-10 h-10 rounded-full border-4 border-purple-600 object-cover"
+    <div className="bg-gray-100 h-screen">
+      {/* Header */}
+      <header className="bg-white w-full shadow-md fixed top-0 left-0 px-6 py-4 flex items-center justify-between z-50">
+        <h1 className="text-xl font-bold text-gray-800">Habits Tracker</h1>
+        <div className="flex items-center justify-center space-x-6 w-full">
+          <div className="relative flex items-center w-2/3">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-600"
+            />
+            <FaSearch className="absolute right-3 text-gray-500" />
+          </div>
+          <div
+            className="relative cursor-pointer"
+            onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+          >
+            <FaBell
+              className={`text-lg ${notificationsEnabled ? 'text-blue-500' : 'text-gray-500'} hover:text-gray-700`}
+            />
+            {notificationsEnabled && (
+              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
+            )}
+          </div>
+          <FaCalendarAlt
+            className="text-gray-500 text-lg cursor-pointer hover:text-gray-700"
+            onClick={() => setShowCalendar(!showCalendar)}
           />
-          <p className="text-xl mt-1 font-semibold text-white">John Doe</p>
+          <div className="text-right ml-auto">
+            <p className="text-sm text-gray-600 text-center">{dayOfWeek}</p>
+            <p className="text-lg font-medium text-gray-800 ml-5">
+              {formattedDate}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* Calendar Popup */}
+      {showCalendar && (
+        <div className="absolute top-20 right-6 bg-white shadow-md rounded-lg p-4 z-10">
+          <Calendar onChange={() => {}} value={currentDate} />
+        </div>
+      )}
+
+      <main className="mt-36 flex h-screen">
+        <div className="w-1/5 h-[800px] bg-yellow-500 rounded-[20px] relative flex flex-col">
+          {/* Profile */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 translate-y-[-50%] w-20 h-20 bg-green-400 rounded-full flex items-center justify-center shadow-md">
+            <FaUser className="text-gray-700 text-3xl" />
+          </div>
+          <div className="mt-12 flex flex-col items-center">
+            <p className="text-gray-800 text-lg font-semibold">{userName || "Guest"}</p>
+          </div>
+
+          <nav className="mt-14 flex flex-col space-y-4 px-5 flex-grow">
+          <div className="menu">
+      {/* Dashboard (no link) */}
+      <Link to="/tracker" className=" bg-black rounded-md flex items-center space-x-4 w-full px-4 py-2">
+        <FaCalendarAlt className="text-white text-xl" />
+        <p className="text-white text-md font-medium">Dashboard</p>
+      </Link>
+
+      {/* Vital Task */}
+      <Link to="/vital-task" className="flex items-center space-x-4 w-full px-4 py-2">
+        <FaBell className="text-gray-700 text-xl" />
+        <p className="text-gray-800 text-md font-medium">Vital Task</p>
+      </Link>
+
+      {/* My Task */}
+      <Link to="/my-task" className="flex items-center space-x-4 w-full px-4 py-2">
+        <FaUser className="text-gray-700 text-xl" />
+        <p className="text-gray-800 text-md font-medium">My Task</p>
+      </Link>
+
+      {/* Task Categories */}
+      <Link to="/task-categories" className="flex items-center space-x-4 w-full px-4 py-2">
+        <FaSearch className="text-gray-700 text-xl" />
+        <p className="text-gray-800 text-md font-medium">Task Categories</p>
+      </Link>
+
+      {/* Settings */}
+      <Link to="/settings" className="flex items-center space-x-4 w-full px-4 py-2">
+        <FaCalendarAlt className="text-gray-700 text-xl" />
+        <p className="text-gray-800 text-md font-medium">Settings</p>
+      </Link>
+
+      {/* Help */}
+      <Link to="/help" className="flex items-center space-x-4 w-full px-4 py-2">
+        <FaBell className="text-gray-700 text-xl" />
+        <p className="text-gray-800 text-md font-medium">Help</p>
+      </Link>
+    </div>
+          </nav>
+
+          {/* Logout */}
+          <div className="mt-auto mb-6 flex items-center justify-center space-x-2">
+            <FaSignOutAlt className="text-gray-700 text-xl" />
+            <button className="text-gray-800 text-md font-medium">Logout</button>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          {sidebarTasks.length > 0 && (
-            <div className="space-y-4">
-              {sidebarTasks.map((task, index) => (
-                <div key={index} className="bg-gray-500 rounded-lg p-3 m-2 text-white">{task}</div>
-              ))}
-            </div>
-          )}
+        {/* Main Content */}
+        <div className="flex-1 h-[800px] bg-gray-200 rounded-[20px] p-4">
+          <p className="text-gray-700 ml-4 text-3xl font-bold">Welcome back, {userName}</p>
+          {/* Task Box */}
+          <div
+  className="border-2 border-gray-500 rounded-[15px] p-4 w-full max-w-[100%] mx-auto mt-4 min-h-[720px]"
+  style={{ maxHeight: 'calc(100vh - 10px)' }}
+>
 
-          <h3 className="text-white font-semibold text-md mt-8">Areas</h3>
-          <div className="flex items-center space-x-4 m-9 hover:bg-white hover:bg-opacity-10 hover:px-4 hover:py-6 transition-all duration-300 hover:rounded-lg">
-            <img src={folder} alt="All Habits" className="w-[20px] h-[20px] filter invert" />
-            <p className="text-white text-sm font-semibold">All Habits</p>
-          </div>
-
-         <div className="flex items-center space-x-4 m-9 hover:bg-white hover:bg-opacity-10 hover:px-8 hover:py-6 transition-all duration-300 hover:rounded-lg">
-               <img src={moon} alt="Time Icon" className="w-[20px] h-[20px] filter invert" />
-               <p className="text-white text-sm font-semibold">{timeOfDay}</p>
-             </div>
-
-          {showTaskInput ? (
-            <div className="flex items-center space-x-4 m-9 p-5">
-              <input
-                type="text"
-                value={newTask}
-                onChange={handleTaskInputChange}
-                placeholder="Assign your task"
-                className="p-2 rounded-md text-black"
-              />
-              <img
-                src={document}
-                alt="Document Icon"
-                className="w-[205px] h-[25px] filter invert cursor-pointer"
-                onClick={handleTaskSubmit}
-              />
-            </div>
-          ) : (
-            <div className="flex items-center space-x-4 m-9 p-5 cursor-pointer" onClick={handleAddTask}>
-              <img src={add} alt="New Areas" className="w-[25px] h-[25px] filter invert" />
-              <p className="text-white text-sm font-semibold">New Areas</p>
-            </div>
-          )}
-
-          <h3 className="text-white font-semibold text-md mt-8">PREFENCES</h3>
-
-          <Link to="/manage-habits">
-  <div className="flex items-center space-x-4 m-9 rounded-lg hover:bg-white hover:bg-opacity-10 hover:px-4 hover:py-6 transition-all duration-300 hover:rounded-lg">
-    <img src={listmenu} alt="Manage Habits" className="w-[20px] h-[20px] filter invert" />
-    <p className="text-white text-sm font-semibold hover:text-gray-200">Manage Habits</p>
-  </div>
-</Link>
-
-<div className="flex items-center space-x-4 m-9 rounded-lg hover:bg-white hover:bg-opacity-10 hover:px-6 hover:py-6 transition-all duration-300 hover:rounded-lg">
-  <img src={settings} alt="App Settings" className="w-[20px] h-[20px] filter invert" />
-  <p className="text-white text-sm font-semibold hover:text-gray-200">App Settings</p>
-</div>
-
-<div className="flex items-center space-x-4 m-9 rounded-lg hover:bg-white hover:bg-opacity-10 hover:px-8 hover:py-6 transition-all duration-300 hover:rounded-lg">
-  <img src={share} alt="Resources" className="w-[20px] h-[20px] filter invert" />
-  <p className="text-white text-sm font-semibold hover:text-gray-200">Resources</p>
-</div>
-
-
-
-        </div>
-      </div>
-
-      <div className="flex flex-col p-5 w-full">
-        <h1 className="text-white text-[26px] font-semibold mb-5">All Habits</h1>
-
-        <div className="flex space-x-4">
-          <div className="w-[40px] h-[40px] bg-gray-500 rounded-md flex items-center justify-center">
-            <img src={search} alt="Search" className="w-[25px] h-[25px] filter invert" />
-          </div>
-
-          <div className="relative">
-            <div
-              className="w-[160px] h-[40px] bg-gray-500 rounded-md flex items-center justify-between px-4 cursor-pointer"
-              onClick={() => setShowDatePicker(!showDatePicker)} >
-              <div className="flex items-center space-x-2">
-                <img src={calender} alt="Calendar" className="w-[25px] h-[25px] filter invert" />
-                <h3 className="text-white font-semibold">{selectedDate}</h3>
-              </div>
-              <img src={arrowdown} alt="Arrow Down" className="w-[20px] h-[20px] filter invert" />
-            </div>
-            {showDatePicker && (
-              <div className="absolute top-[50px] left-0 w-[350px] bg-gray-700 rounded-md p-3 shadow-lg">
-                <Calendar onChange={handleDateClick} value={new Date()} showNeighboringMonth={false} />
-              </div>
-            )}
-          </div>
-
-          <div className="relative w-[165px] h-[40px] bg-gray-500 rounded-md flex items-center justify-between px-3 cursor-pointer">
-            <div className="flex items-center space-x-2">
-              <img src={reminder} alt="Reminder" className="w-[35px] h-[25px] filter invert" />
-              <h3 className="text-white font-medium text-sm truncate">{reminderText}</h3>
-            </div>
-            <img src={arrowdown} alt="Arrow Down" className="w-[20px] h-[20px] filter invert" onClick={() => setShowOptions(!showOptions)} />
-            {showOptions && (
-              <div className="absolute top-[42px] left-0 w-full bg-gray-600 rounded-md text-white text-sm">
-                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleOptionClick("Reminder Time")}>Reminder Time</div>
-                <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => handleOptionClick("My Habits Order")}>My Habits Order</div>
-              </div>
-            )}
-          </div>
-
-          <div className="relative w-[165px] h-[40px] bg-blue-500 rounded-md flex items-center justify-between px-3 cursor-pointer">
-            <div className="flex items-center space-x-2">
-              <img src={add} alt="Habit Icon" className="w-[30px] h-[25px] filter invert" />
-              <h3 className="text-white font-medium text-sm truncate">{habitText}</h3>
-            </div>
-            <img
-              src={arrowdown}
-              alt="Arrow Down"
-              className="w-[20px] h-[20px] filter invert"
-              onClick={() => setShowHabitOptions(!showHabitOptions)} />
-            {showHabitOptions && (
-              <div className="absolute top-[42px] left-0 w-full bg-gray-600 rounded-md text-white text-sm">
-                <div
-                  className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
-                  onClick={() => handleHabitOptionClick("Add Habit")}>
-                  Add Habit
-                </div>
-                <div
-                  className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
-                  onClick={() => handleHabitOptionClick("Remove Habit")}>
-                  Remove Habit
-                </div>
-              </div>
-            )}
-          </div>
+            <div className="w-full h-[690px] rounded-[15px] flex space-x-4">
+              <div className="w-[60%] flex flex-col space-y-4">
+                {/* Left Box */}
+                <div className="flex-1 bg-gray-100 w-[100%] p-4 rounded-[10px]">
+                  {/* To-Do Section */}
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="flex items-center space-x-2">
+                      <img src={pending} alt="To-Do Icon" className="w-6 h-6" />
+                      <p className="text-gray-700 text-lg font-semibold">To-Do</p>
+                    </div>
+                    <button onClick={toggleModal} className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 transition ease-in duration-200">
+                    
+          <FaPlus className="text-white text-md" />
+          <span>Add Task</span>
         
+      </button>
+      {/* Modal */}
+      {isModalOpen && (
+  <div className="fixed inset-0 backdrop-blur-md z-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded-md w-[700px] h-[600px] ">
+      {/* Modal Header */}
+      <div className="flex justify-between mb-4">
+        <h2 className="text-xl font-semibold">Add New Task</h2>
+        <button
+          className="text-blue-500 underline"
+          onClick={closeModal}
+        >
+          Go Back
+        </button>
+      </div>
+
+      {/* Task Form */}
+      <div className="space-y-6">
+        {/* Title */}
+        <div>
+          <label htmlFor="task-title" className="text-sm font-medium text-gray-700">Title</label>
+          <input
+            type="text"
+            id="task-title"
+            placeholder="Enter task title"
+            className="w-full p-2 border rounded-md mt-2"
+          />
+        </div>
+
+        {/* Date */}
+        <div>
+          <label htmlFor="task-date" className="text-sm font-medium text-gray-700">Date</label>
+          <div className="relative mt-2">
+            <input
+              type="date"
+              id="task-date"
+              className="w-full p-2 border rounded-md pl-10"
+            />
+            <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          </div>
+        </div>
+
+        {/* Priority */}
+        <div>
+          <label className="text-sm font-medium text-gray-700">Priority</label>
+          <div className="flex space-x-6 mt-2">
+            {/* Extreme */}
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
+                <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+                <span className="text-sm text-gray-700">Extreme</span>
+              </div>
+              <input
+                type="checkbox"
+                id="priority-extreme"
+                className="form-checkbox text-red-500"
+              />
+            </div>
+
+            {/* Moderate */}
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
+                <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
+                <span className="text-sm text-gray-700">Moderate</span>
+              </div>
+              <input
+                type="checkbox"
+                id="priority-moderate"
+                className="form-checkbox text-blue-500"
+              />
+            </div>
+
+            {/* Low */}
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
+                <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-gray-700">Low</span>
+              </div>
+              <input
+                type="checkbox"
+                id="priority-low"
+                className="form-checkbox text-green-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Task Description and Upload Image */}
+        <div className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0">
+          {/* Task Description */}
+          <div className="flex-1">
+            <label htmlFor="task-description" className="text-sm font-medium text-gray-700">Task Description</label>
+            <textarea
+              id="task-description"
+              placeholder="Start writing here"
+              className="w-full p-2 border rounded-md mt-2"
+              rows="4"
+            ></textarea>
+          </div>
+
+          {/* Upload Image */}
+          {/* Upload Image */}
+          <div className="flex-1">
+  <label className="text-sm font-medium text-gray-700">Upload Image</label>
+  <div className="flex flex-col items-center border border-dashed p-4 rounded-md mt-2 space-y-3">
+    <FaUpload className="text-gray-500 text-2xl" />
+    <span className="text-gray-500 text-sm text-center">Drag or drop files here</span>
+
+    {/* Hidden File Input */}
+    <input
+      type="file"
+      id="file-upload"
+      className="hidden"
+      onChange={(e) => console.log(e.target.files[0])} // Replace with your file handling logic
+    />
+
+    {/* Trigger for File Input */}
+    <button
+      onClick={() => document.getElementById('file-upload').click()}
+      className="text-white bg-blue-500 px-4 py-2 rounded-md text-sm"
+    >
+      Browse
+    </button>
+  </div>
+</div>
+</div>
+
+        {/* Done Button */}
+        <div className="flex justify-start">
+          <button className="bg-green-500 text-white px-4 py-2 rounded-md text-sm">
+            Done
+          </button>
         </div>
       </div>
+    </div>
+  </div>
+)}
+
+
+
+
+
+                  </div>
+
+                  {/* Task Details */}
+<div className="bg-white p-2 rounded-[12px] shadow-md mt-4 min-h-[80px]">
+  <div className="flex justify-between items-start">
+    <div className="flex items-center">
+      <input
+        type="checkbox"
+        id="task-checkbox"
+        className="w-3 h-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded-full"
+      />
+      <label htmlFor="task-checkbox" className="ml-4 text-gray-700 text-xl font-bold">
+        Attend Birthday Nicho Party
+      </label>
+    </div>
+    <FaEllipsisV className="text-gray-500 text-lg cursor-pointer hover:text-gray-700 rotate-90" />
+  </div>
+  
+  {/* Description */}
+  <div className="flex items-center space-x-3 mt-3">
+    <div className="mt-1 ml-[30px]">
+      <p className="text-gray-600 text-sm overflow-hidden overflow-ellipsis line-clamp-2">
+        Prepare gifts and bring a dessert for the party. Arrive by 7 PM at the venue.
+      </p>
+    </div>
+
+    <div className="w-16 h-16 flex-shrink-0 flex items-center justify-center">
+      <img
+        src={walking}
+        alt={taskName}
+        className="w-full h-full object-cover rounded-lg"
+      />
+    </div>
+  </div>
+
+  {/* Status */}
+  <div className="mt-4 text-sm text-gray-600">
+    <div className="flex justify-between">
+      <div className="flex items-center space-x-2">
+        <p className="font-semibold">Priority:</p>
+        <span className="text-yellow-500">Moderate</span>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="font-semibold">Status:</p>
+        <span className={`text-${taskStatus === 'Not Started' ? 'red' : 'green'}-500`}>
+          {taskStatus}
+        </span>
+      </div>
+      <div className="mt-1 flex">
+        <p className="font-semibold">Created On:</p>
+        <p className="text-gray-500">24/05/2024</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{/* Task Details */}
+<div className="bg-white p-2 rounded-[12px] shadow-md mt-4 min-h-[80px]">
+  <div className="flex justify-between items-start ">
+    <div className="flex items-center">
+      <input
+        type="checkbox"
+        id="task-checkbox"
+        className="w-3 h-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded-full"
+      />
+      <label htmlFor="task-checkbox" className="ml-4 text-gray-700 text-xl font-bold">
+        Attend Birthday Nicho Party
+      </label>
+    </div>
+    <FaEllipsisV className="text-gray-500 text-lg cursor-pointer hover:text-gray-700 rotate-90" />
+  </div>
+  
+  {/* Description */}
+  <div className="flex items-center space-x-3 mt-3">
+    <div className="mt-1 ml-[30px]">
+      <p className="text-gray-600 text-sm overflow-hidden overflow-ellipsis line-clamp-2">
+        Prepare gifts and bring a dessert for the party. Arrive by 7 PM at the venue.
+      </p>
+    </div>
+
+    <div className="w-16 h-16 flex-shrink-0 flex items-center justify-center">
+      <img
+        src={walking}
+        alt="Party Preparation"
+        className="w-full h-full object-cover rounded-lg"
+      />
+    </div>
+  </div>
+
+  {/* Status */}
+  <div className="mt-4 text-sm text-gray-600">
+    <div className="flex justify-between">
+      <div className="flex items-center space-x-2">
+        <p className="font-semibold">Priority:</p>
+        <span className="text-yellow-500">Moderate</span>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="font-semibold">Status:</p>
+        <span className={`text-${taskStatus === 'In Progress' ? 'blue' : 'green'}-500`}>
+          {taskStatus}
+        </span>
+      </div>
+      <div className="mt-1 flex">
+        <p className="font-semibold">Created On:</p>
+        <p className="text-gray-500">24/05/2024</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{/* Divider Line */}
+<div className="border-t-2 border-gray-300 my-9"></div>
+
+
+{/* Task Details - Completed */}
+<div className="bg-white p-2 rounded-[12px] shadow-md mt-4 min-h-[80px]">
+  <div className="flex justify-between items-start border-b-2 border-gray-300 pb-4 mb-4">
+    <div className="flex items-center">
+      <input
+        type="checkbox"
+        id="task-checkbox-completed"
+        checked
+        readOnly
+        className="w-3 h-4 text-green-500 focus:ring-green-400 border-gray-300 rounded-full"
+      />
+      <label
+        htmlFor="task-checkbox-completed"
+        className="ml-4 text-gray-700 text-xl font-bold"
+      >
+        Finish Project Report
+      </label>
+    </div>
+    <FaEllipsisV className="text-gray-500 text-lg cursor-pointer hover:text-gray-700 rotate-90" />
+  </div>
+
+  {/* Description */}
+  <div className="flex items-center space-x-2 ">
+    <div className="mt-1 ml-[30px]">
+      <p className="text-gray-600 text-sm overflow-hidden overflow-ellipsis line-clamp-2">
+        Submit the final project report to the manager by email before the deadline.
+      </p>
+    </div>
+    <div className="w-16 h-16 flex-shrink-0 flex items-center justify-center">
+      <img
+        src={walking}
+        alt="Report Submission"
+        className="w-full h-full object-cover rounded-lg"
+      />
+    </div>
+  </div>
+
+  {/* Status */}
+  <div className="mt-4 text-sm text-gray-600">
+    <div className="flex justify-between">
+      <div className="flex items-center space-x-2">
+        <p className="font-semibold">Priority:</p>
+        <span className="text-green-500">Low</span>
+      </div>
+      <div className="flex items-center space-x-2">
+        <p className="font-semibold">Status:</p>
+        <span className="text-green-500">In Progress</span>
+      </div>
+      <div className="mt-1 flex">
+        <p className="font-semibold">Completed On:</p>
+        <p className="text-gray-500">25/05/2024</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="flex flex-col space-y-4 w-[45%]">
+              <div className="bg-white p-4 h-[30%] rounded-[10px]">
+      {/* Task Status Header */}
+      <div className="flex items-center mb-4">
+        <FaTasks className="text-white-700 text-2xl mr-2" />
+        <p className="text-gray-700 text-lg font-semibold">Task Status</p>
+      </div>
+
+      {/* Dashboard Content */}
+      <div className="flex justify-around items-center">
+        {/* Completed */}
+        <div className="flex flex-col items-center">
+          <div className="relative">
+            <svg className="w-16 h-16">
+              <circle
+                cx="32"
+                cy="32"
+                r="28"
+                fill="none"
+                stroke="#e5e7eb"
+                strokeWidth="6"
+              />
+              <circle
+                cx="32"
+                cy="32"
+                r="28"
+                fill="none"
+                stroke="#10b981"
+                strokeWidth="6"
+                strokeDasharray="175.84"
+                strokeDashoffset="28.13"
+                strokeLinecap="round"
+              />
+            </svg>
+            <p className="absolute inset-0 flex items-center justify-center text-green-500 font-bold text-lg">
+              84%
+            </p>
+          </div>
+          <p className="mt-2 text-sm flex items-center">
+        <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+        <span className="text-green-500 font-medium">Completed</span>
+      </p>
+        </div>
+
+        {/* In Progress */}
+        <div className="flex flex-col items-center">
+          <div className="relative">
+            <svg className="w-16 h-16">
+              <circle
+                cx="32"
+                cy="32"
+                r="28"
+                fill="none"
+                stroke="#e5e7eb"
+                strokeWidth="6"
+              />
+              <circle
+                cx="32"
+                cy="32"
+                r="28"
+                fill="none"
+                stroke="#3b82f6"
+                strokeWidth="6"
+                strokeDasharray="175.84"
+                strokeDashoffset="94.36"
+                strokeLinecap="round"
+              />
+            </svg>
+            <p className="absolute inset-0 flex items-center justify-center text-blue-500 font-bold text-lg">
+              46%
+            </p>
+          </div>
+          <p className="mt-2 text-sm flex items-center">
+        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+        <span className="text-blue-500 font-medium">In Progress</span>
+      </p>
+        </div>
+
+        {/* Not Started */}
+        <div className="flex flex-col items-center">
+          <div className="relative">
+            <svg className="w-16 h-16">
+              <circle
+                cx="32"
+                cy="32"
+                r="28"
+                fill="none"
+                stroke="#e5e7eb"
+                strokeWidth="6"
+              />
+              <circle
+                cx="32"
+                cy="32"
+                r="28"
+                fill="none"
+                stroke="#f87171"
+                strokeWidth="6"
+                strokeDasharray="175.84"
+                strokeDashoffset="152.18"
+                strokeLinecap="round"
+              />
+            </svg>
+            <p className="absolute inset-0 flex items-center justify-center text-red-500 font-bold text-lg">
+              13%
+            </p>
+          </div>
+          <p className="mt-2 text-sm flex items-center">
+        <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+        <span className="text-red-500 font-medium">Not Started</span>
+      </p>
+        </div>
+      </div>
+    </div>
+
+    <div className="bg-white p-2 rounded-[12px] shadow-md mt-9 min-h-[80px]">
+      <div className="flex justify-between items-start border-b-2 border-gray-300 pb-4 mb-4">
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="task-checkbox-completed"
+            checked={isChecked}
+            onChange={() => setIsChecked(!isChecked)}
+            className="w-3 h-4 text-green-500 focus:ring-green-400 border-gray-300 rounded-full"
+          />
+          <label
+            htmlFor="task-checkbox-completed"
+            className="ml-4 text-gray-700 text-xl font-bold"
+          >
+            Finish Project Report
+          </label>
+        </div>
+        <FaEllipsisV className="text-gray-500 text-lg cursor-pointer hover:text-gray-700 rotate-90" />
+      </div>
+
+      {/* Description */}
+      <div className="flex items-center space-x-2">
+        <div className="mt-1 ml-[30px]">
+          <p className="text-gray-600 text-sm overflow-hidden overflow-ellipsis line-clamp-2">
+            Submit the final project report to the manager by email before the deadline.
+          </p>
+          <p
+            className={`text-sm mt-2 font-semibold ${
+              isChecked ? "text-green-600" : "text-orange-600"
+            }`}
+          >
+            Status: {status}
+          </p>
+          <p className="text-gray-500 text-sm mt-1">Created on: 20/02/2024</p>
+        </div>
+        <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
+          <img
+            src={walking}
+            alt="Report Submission"
+            className="w-full h-full object-cover rounded-lg"
+          />
+        </div>
+      </div>
+    
+    
+  </div>
+  {/* Divider Line */}
+<div className="border-t-2 border-gray-300 my-9"></div>
+  <div className="bg-white p-2 rounded-[12px] shadow-md mt-4 min-h-[80px]">
+      <div className="flex justify-between items-start border-b-2 border-gray-300 pb-4 mb-4">
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="task-checkbox-completed"
+            checked={isChecked}
+            onChange={() => setIsChecked(!isChecked)}
+            className="w-3 h-4 text-green-500 focus:ring-green-400 border-gray-300 rounded-full"
+          />
+          <label
+            htmlFor="task-checkbox-completed"
+            className="ml-4 text-gray-700 text-xl font-bold"
+          >
+            Finish Project Report
+          </label>
+        </div>
+        <FaEllipsisV className="text-gray-500 text-lg cursor-pointer hover:text-gray-700 rotate-90" />
+      </div>
+
+      {/* Description */}
+      <div className="flex items-center space-x-2">
+        <div className="mt-1 ml-[30px]">
+          <p className="text-gray-600 text-sm overflow-hidden overflow-ellipsis line-clamp-2">
+            Submit the final project report to the manager by email before the deadline.
+          </p>
+          <p
+            className={`text-sm mt-2 font-semibold ${
+              isChecked ? "text-green-600" : "text-orange-600"
+            }`}
+          >
+            Status: {status}
+          </p>
+          <p className="text-gray-500 text-sm mt-1">Created on: 20/02/2024</p>
+        </div>
+        <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
+          <img
+            src={walking}
+            alt="Report Submission"
+            className="w-full h-full object-cover rounded-lg"
+          />
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
