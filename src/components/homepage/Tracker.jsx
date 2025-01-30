@@ -174,7 +174,8 @@ const Tracker = () => {
       </div>
 
       {/* Task Form */}
-      <div className="space-y-6">
+      <div 
+      className="space-y-6">
         {/* Title */}
         <div>
           <label htmlFor="task-title" className="text-sm font-medium text-gray-700">Title</label>
@@ -302,7 +303,8 @@ const Tracker = () => {
                   </div>
 
                   {/* Task Details */}
-<div className="bg-white p-2 rounded-[12px] shadow-md mt-4 min-h-[80px]">
+<div 
+className="bg-white p-2 rounded-[12px] shadow-md mt-4 min-h-[80px]">
   <div className="flex justify-between items-start">
     <div className="flex items-center">
       <input
